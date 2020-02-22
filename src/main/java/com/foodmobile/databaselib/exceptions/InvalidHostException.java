@@ -1,4 +1,4 @@
-package exceptions;
+package com.foodmobile.databaselib.exceptions;
 
 public class InvalidHostException extends Exception {
     @Override

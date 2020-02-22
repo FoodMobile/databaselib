@@ -1,6 +1,6 @@
-package adapters;
+package com.foodmobile.databaselib.adapters;
 
-import models.Entity;
+import com.foodmobile.databaselib.models.Entity;
 
 import java.util.List;
 

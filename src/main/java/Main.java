@@ -1,6 +1,7 @@
-import adapters.ConnectionInfo;
-import adapters.MongoDBAdapter;
-import adapters.MongoQuery;
+import com.foodmobile.databaselib.DatabaseAdapter;
+import com.foodmobile.databaselib.adapters.ConnectionInfo;
+import com.foodmobile.databaselib.adapters.MongoDBAdapter;
+import com.foodmobile.databaselib.adapters.MongoQuery;
 import java.util.List;
 
 
@@ -17,8 +18,9 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        MongoQuery query = ((MongoQuery) DatabaseAdapter.shared.queryFactory()).setCollection("users");
+
         try {
+            MongoQuery query = ((MongoQuery) DatabaseAdapter.shared.queryFactory()).setCollection("users");
             User newUser = new User();
             newUser.name = "john";
             DatabaseAdapter.shared.create(query,newUser);

@@ -1,14 +1,12 @@
-package models;
+package com.foodmobile.databaselib.models;
 
-import annotations.DBIgnore;
+import com.foodmobile.databaselib.annotations.DBIgnore;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.bson.Document;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 

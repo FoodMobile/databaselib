@@ -1,6 +1,6 @@
-package adapters;
+package com.foodmobile.databaselib.adapters;
 
-import exceptions.InvalidHostException;
+import com.foodmobile.databaselib.exceptions.InvalidHostException;
 
 import java.util.LinkedList;
 import java.util.List;

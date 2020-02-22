@@ -1,5 +1,5 @@
-import annotations.DBId;
-import models.Entity;
+import com.foodmobile.databaselib.annotations.DBId;
+import com.foodmobile.databaselib.models.Entity;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 

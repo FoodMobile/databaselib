@@ -1,12 +1,12 @@
-package adapters;
+package com.foodmobile.databaselib.adapters;
 
-import annotations.DBId;
+import com.foodmobile.databaselib.annotations.DBId;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import exceptions.InvalidHostException;
-import exceptions.InvalidQueryType;
-import models.Entity;
+import com.foodmobile.databaselib.exceptions.InvalidHostException;
+import com.foodmobile.databaselib.exceptions.InvalidQueryType;
+import com.foodmobile.databaselib.models.Entity;
 import org.bson.Document;
 
 import java.lang.reflect.Constructor;
@@ -17,8 +17,13 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MongoDBAdapter implements DBAdapter {
+
     private MongoClient client;
+
+    // Reference to the mongo db
     private MongoDatabase db;
+
+
     @Override
     public <T> List<T> read(QueryDetails details, Class<T> tClass) throws Exception{
         MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
@@ -68,6 +73,13 @@ public class MongoDBAdapter implements DBAdapter {
     }
 
 
+    /**
+     * Connects to the mongodb cluster with a list of hosts. Note that the same credentials and database name are used
+     * for every host so these must be the same across hosts.
+     * @param info Connection information required to connect to MongoDB
+     * @throws Exception Connection Exceptions may be thrown by the Mongo driver, as well as host validation exceptions
+     * (see com.foodmobile.databaselib.exceptions for a list of exceptions)
+     */
     @Override
     public void connect(ConnectionInfo info) throws Exception{
         List<ServerAddress> addressList = info.hosts.stream().map((h)->{
@@ -77,12 +89,16 @@ public class MongoDBAdapter implements DBAdapter {
         Host firstHost = info.hosts.stream().findFirst().orElseThrow(InvalidHostException::new).validate();
         MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(info.connectionsPerHost).sslEnabled(info.useSsl).build();
         MongoCredential credential = MongoCredential.createCredential(firstHost.username,info.database,firstHost.password.toCharArray());
-        if(addressList.size() == 1){
-            this.client = new MongoClient(addressList.get(0),credential,options);
-        }else{
-            this.client = new MongoClient(addressList,credential,options);
-        }
+
+        this.client = new MongoClient(addressList,credential,options);
+
         this.db = this.client.getDatabase(info.database);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.db = null;
+        this.client.close();
     }
 
     @Override

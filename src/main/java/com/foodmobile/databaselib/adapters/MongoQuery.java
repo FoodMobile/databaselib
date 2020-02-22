@@ -1,4 +1,4 @@
-package adapters;
+package com.foodmobile.databaselib.adapters;
 
 import org.bson.conversions.Bson;
 

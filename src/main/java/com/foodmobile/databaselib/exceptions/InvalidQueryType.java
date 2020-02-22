@@ -1,4 +1,4 @@
-package exceptions;
+package com.foodmobile.databaselib.exceptions;
 
 public class InvalidQueryType extends Exception {
     @Override
