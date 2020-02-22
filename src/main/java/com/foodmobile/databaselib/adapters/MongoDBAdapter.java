@@ -1,6 +1,7 @@
 package com.foodmobile.databaselib.adapters;
 
 import com.foodmobile.databaselib.annotations.DBId;
+import com.foodmobile.databaselib.annotations.DBIgnore;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -57,7 +58,7 @@ public class MongoDBAdapter implements DBAdapter {
         MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
                 .orElseThrow(InvalidQueryType::new);
         MongoCollection<Document> collection = this.db.getCollection(query.collection);
-        Document d = new Document(obj.keyValuePairs(DBId.class));
+        Document d = new Document(obj.keyValuePairs(DBId.class, DBIgnore.class));
         collection.insertOne(d);
         return 1;
     }
