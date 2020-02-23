@@ -8,7 +8,8 @@ import com.mongodb.client.MongoDatabase;
 import com.foodmobile.databaselib.exceptions.InvalidHostException;
 import com.foodmobile.databaselib.exceptions.InvalidQueryType;
 import com.foodmobile.databaselib.models.Entity;
-import org.bson.Document;
+import org.bson.*;
+import org.bson.conversions.Bson;
 
 import java.lang.reflect.Constructor;
 import java.util.LinkedList;
@@ -65,14 +66,53 @@ public class MongoDBAdapter implements DBAdapter {
 
     @Override
     public <T extends Entity> int update(QueryDetails details, T obj) throws Exception{
-        return 0;
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+        Bson updateObj = new Document(obj.keyValuePairs(DBIgnore.class));
+        collection.updateOne(query.filter,updateObj);
+        return 1;
     }
 
     @Override
-    public int delete(QueryDetails details) throws Exception {
-        return 0;
+    public int deleteOne(QueryDetails details) throws Exception {
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+        collection.deleteOne(query.filter);
+        return 1;
     }
 
+    @Override
+    public int deleteMany(QueryDetails details) throws Exception {
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+        collection.deleteMany(query.filter);
+        return 1;
+    }
+
+    public <T extends Entity> int create(QueryDetails details,List<T> obj) throws Exception{
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+        List<Document> docs = obj.stream()
+                .map(o -> new Document(o.keyValuePairs(DBId.class,DBIgnore.class)))
+                .collect(Collectors.toList());
+        collection.insertMany(docs);
+        return obj.size();
+    }
+
+    public <T extends Entity> int update(QueryDetails details, List<T> obj) throws Exception{
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+        List<Bson> docs = obj.stream()
+                .map(o -> new Document(o.keyValuePairs(DBIgnore.class)))
+                .collect(Collectors.toList());
+        collection.updateMany(query.filter,docs);
+        return obj.size();
+    }
 
     /**
      * Connects to the mongodb cluster with a list of hosts. Note that the same credentials and database name are used

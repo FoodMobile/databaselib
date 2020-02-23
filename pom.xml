@@ -7,6 +7,12 @@
     <groupId>org.foodmobile</groupId>
     <artifactId>databaselib</artifactId>
     <version>1.0</version>
+    <repositories>
+        <repository>
+            <id>FoodmobileRepo</id>
+            <url>https://mymavenrepo.com/repo/15MSmTSCqdNKgB3459tN/</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -33,9 +39,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
-
-
     </dependencies>
 
-
+    <distributionManagement>
+        <repository>
+            <id>FoodmobileRepo</id>
+            <url>https://mymavenrepo.com/repo/hzwesDJarEjWXDcWfKf3/</url>
+        </repository>
+    </distributionManagement>
 </project>

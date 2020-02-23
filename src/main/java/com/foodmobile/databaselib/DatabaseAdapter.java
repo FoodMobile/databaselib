@@ -6,6 +6,7 @@ import com.foodmobile.databaselib.adapters.QueryDetails;
 import com.foodmobile.databaselib.exceptions.NoAdapterOpenException;
 import com.foodmobile.databaselib.models.Entity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class DatabaseAdapter implements DBAdapter {
      */
     @Override
     public <T extends Entity> int create(QueryDetails details, T obj) throws Exception{
-        return this.adapter.orElseThrow(NoAdapterOpenException::new).create(details,obj);
+        return this.create(details, Collections.singletonList(obj));
     }
 
 
@@ -56,7 +57,7 @@ public class DatabaseAdapter implements DBAdapter {
      */
     @Override
     public <T extends Entity> int update(QueryDetails details, T obj) throws Exception{
-        return this.adapter.orElseThrow(NoAdapterOpenException::new).update(details,obj);
+        return this.update(details,Collections.singletonList(obj));
     }
 
     /**
@@ -65,8 +66,14 @@ public class DatabaseAdapter implements DBAdapter {
      * @throws Exception Multiple exceptions may be thrown differing per database adapter.
      */
     @Override
-    public int delete(QueryDetails details) throws Exception {
-        return this.adapter.orElseThrow(NoAdapterOpenException::new).delete(details);
+    public int deleteOne(QueryDetails details) throws Exception {
+        return this.adapter.orElseThrow(NoAdapterOpenException::new).deleteOne(details);
+    }
+
+
+    @Override
+    public int deleteMany(QueryDetails details) throws Exception {
+        return this.adapter.orElseThrow(NoAdapterOpenException::new).deleteMany(details);
     }
 
     /**
@@ -87,6 +94,14 @@ public class DatabaseAdapter implements DBAdapter {
     @Override
     public <T extends QueryDetails> T queryFactory() throws Exception{
         return this.adapter.orElseThrow(NoAdapterOpenException::new).queryFactory();
+    }
+
+    public <T extends Entity> int create(QueryDetails details,List<T> obj) throws Exception{
+        return this.adapter.orElseThrow(NoAdapterOpenException::new).create(details,obj);
+    }
+
+    public <T extends Entity> int update(QueryDetails details, List<T> obj) throws Exception{
+        return this.adapter.orElseThrow(NoAdapterOpenException::new).update(details,obj);
     }
 
     /**

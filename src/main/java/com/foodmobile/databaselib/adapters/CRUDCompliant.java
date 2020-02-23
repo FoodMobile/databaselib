@@ -12,5 +12,11 @@ public interface CRUDCompliant {
 
     public <T extends Entity> int update(QueryDetails details, T obj) throws Exception;
 
-    public int delete(QueryDetails details) throws Exception;
+    public <T extends Entity> int create(QueryDetails details,List<T> obj) throws Exception;
+
+    public <T extends Entity> int update(QueryDetails details, List<T> obj) throws Exception;
+
+    public int deleteOne(QueryDetails details) throws Exception;
+
+    public int deleteMany(QueryDetails details) throws Exception;
 }
