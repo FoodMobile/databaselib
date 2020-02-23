@@ -4,7 +4,7 @@ import com.foodmobile.databaselib.models.Entity;
 
 import java.util.List;
 
-public interface CRUDCompliant {
+interface CRUDCompliant {
 
     public <T> List<T> read(QueryDetails details, Class<T> tClass) throws Exception;
 

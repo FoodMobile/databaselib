@@ -17,16 +17,19 @@ public class DatabaseAdapter implements DBAdapter {
 
     private Optional<DBAdapter> adapter;
 
+    /**
+     * Shared reference to the database adapter.
+     */
     public static DatabaseAdapter shared;
 
     public <T extends DBAdapter> DatabaseAdapter(Class<T> tClass) throws Exception {
         this.adapter = Optional.of(tClass.getConstructor().newInstance());
     }
 
-    /**
+    /** Reads data from the database and serializes each row / document to a concrete class provided by T.
      * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
      * @param tClass Class type that the data fetched from the database should be serialized to
-     * @param <T> Class type that the data fetched from the database should be serialized to
+     * @param <T> Type constraint ensures that the class provided must be a subclass of Entity.
      * @return A list of T objects (serialized from the data received from the database)
      * @throws Exception Multiple exceptions may be thrown differing per database adapter.
      */
@@ -35,7 +38,9 @@ public class DatabaseAdapter implements DBAdapter {
         return this.adapter.orElseThrow(NoAdapterOpenException::new).read(details,tClass);
     }
 
-    /**
+    /** Inserts 1 entity into the database. The information for the insert query is gatherd by calling obj.keyValuePairs.
+     * Any custom serialization of data should be done by overriding the method keyValuePairs(Class< ? extends Annotation > ...)
+     * in the class T.
      * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
      * @param obj Object that should be inserted into the database.
      * @param <T> Type constraint. An object that is to be inserted must extend Entity
@@ -48,7 +53,9 @@ public class DatabaseAdapter implements DBAdapter {
     }
 
 
-    /**
+    /** Updates 1 entity in the database. The information for the update query is gathered by calling obj.keyValuePairs.
+     * Any custom serialization of data should be done by overriding the method keyValuePairs(Class< ? extends Annotation > ...)
+     * in the class T.
      * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
      * @param obj Object that should be inserted into the database.
      * @param <T> Type constraint. An object that is to be inserted must extend Entity
@@ -60,7 +67,7 @@ public class DatabaseAdapter implements DBAdapter {
         return this.update(details,Collections.singletonList(obj));
     }
 
-    /**
+    /** Deletes at most 1 entity in the database that matches the provided query information.
      * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
      * @return Number of rows (or documents) deleted.
      * @throws Exception Multiple exceptions may be thrown differing per database adapter.
@@ -71,6 +78,12 @@ public class DatabaseAdapter implements DBAdapter {
     }
 
 
+    /**
+     * Deletes all entities in the database that match the provided query information.
+     * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
+     * @return Number of rows (or documents) deleted.
+     * @throws Exception Multiple exceptions may be thrown differing per database adapter.
+     */
     @Override
     public int deleteMany(QueryDetails details) throws Exception {
         return this.adapter.orElseThrow(NoAdapterOpenException::new).deleteMany(details);
@@ -96,10 +109,26 @@ public class DatabaseAdapter implements DBAdapter {
         return this.adapter.orElseThrow(NoAdapterOpenException::new).queryFactory();
     }
 
+    /** Inserts multiple entities into the database using the provided query information. Each obj is serialized by calling
+     * obj.keyValuePairs(...). To add custom serialization override this method in class T.
+     * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
+     * @param obj Objects that should be inserted into the database.
+     * @param <T> Type constraint. An object that is to be inserted must extend Entity
+     * @return Number of rows (or documents) inserted
+     * @throws Exception Multiple exceptions may be thrown differing per database adapter.
+     */
     public <T extends Entity> int create(QueryDetails details,List<T> obj) throws Exception{
         return this.adapter.orElseThrow(NoAdapterOpenException::new).create(details,obj);
     }
 
+    /** Updates multiple entities in the database using the query information provided. Each obj is serialized by calling
+     * obj.keyValuePairs(...). To add custom serialization override this method in class T.
+     * @param details Query details contain all the information relevant for a query (tablename, projection, etc.)
+     * @param obj Objects that should be inserted into the database.
+     * @param <T> Type constraint. An object that is to be inserted must extend Entity
+     * @return Number of rows (or documents) affected by the update.
+     * @throws Exception Multiple exceptions may be thrown differing per database adapter.
+     */
     public <T extends Entity> int update(QueryDetails details, List<T> obj) throws Exception{
         return this.adapter.orElseThrow(NoAdapterOpenException::new).update(details,obj);
     }

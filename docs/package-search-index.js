@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.foodmobile.databaselib"},{"l":"com.foodmobile.databaselib.adapters"},{"l":"com.foodmobile.databaselib.annotations"},{"l":"com.foodmobile.databaselib.exceptions"},{"l":"com.foodmobile.databaselib.models"}]

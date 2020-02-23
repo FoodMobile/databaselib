@@ -1,0 +1,6 @@
+unnamed package
+com.foodmobile.databaselib
+com.foodmobile.databaselib.adapters
+com.foodmobile.databaselib.annotations
+com.foodmobile.databaselib.exceptions
+com.foodmobile.databaselib.models

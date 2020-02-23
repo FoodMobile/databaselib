@@ -123,9 +123,10 @@ public class MongoDBAdapter implements DBAdapter {
      */
     @Override
     public void connect(ConnectionInfo info) throws Exception{
-        List<ServerAddress> addressList = info.hosts.stream().map((h)->{
-           return new ServerAddress(h.hostName,h.hostPort);
-        }).collect(Collectors.toList());
+        List<ServerAddress> addressList = info.hosts
+                .stream()
+                .map((h)-> new ServerAddress(h.hostName,h.hostPort))
+                .collect(Collectors.toList());
 
         Host firstHost = info.hosts.stream().findFirst().orElseThrow(InvalidHostException::new).validate();
         MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(info.connectionsPerHost).sslEnabled(info.useSsl).build();
