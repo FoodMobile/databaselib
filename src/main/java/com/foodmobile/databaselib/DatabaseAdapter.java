@@ -2,10 +2,12 @@ package com.foodmobile.databaselib;
 
 import com.foodmobile.databaselib.adapters.ConnectionInfo;
 import com.foodmobile.databaselib.adapters.DBAdapter;
+import com.foodmobile.databaselib.adapters.MongoDBAdapter;
 import com.foodmobile.databaselib.adapters.QueryDetails;
 import com.foodmobile.databaselib.exceptions.NoAdapterOpenException;
 import com.foodmobile.databaselib.models.Entity;
 
+import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +22,13 @@ public class DatabaseAdapter implements DBAdapter {
     /**
      * Shared reference to the database adapter.
      */
-    public static DatabaseAdapter shared;
+    private static DatabaseAdapter shared = new DatabaseAdapter();
 
-    public <T extends DBAdapter> DatabaseAdapter(Class<T> tClass) throws Exception {
-        this.adapter = Optional.of(tClass.getConstructor().newInstance());
+    public static DBAdapter produceMongoAdapter(){
+        if(shared.adapter.isEmpty()){
+            shared.adapter = Optional.of(new MongoDBAdapter());
+        }
+        return shared;
     }
 
     /** Reads data from the database and serializes each row / document to a concrete class provided by T.
@@ -137,8 +142,10 @@ public class DatabaseAdapter implements DBAdapter {
      * Closes the connection to the database server / cluster.
      */
     @Override
-    public void close() throws Exception{
-        this.adapter.orElseThrow(NoAdapterOpenException::new).close();
-        this.adapter = Optional.empty();
+    public void close(){
+        try {
+            this.adapter.orElseThrow(NoAdapterOpenException::new).close();
+            this.adapter = Optional.empty();
+        }catch(Exception ignore){}
     }
 }

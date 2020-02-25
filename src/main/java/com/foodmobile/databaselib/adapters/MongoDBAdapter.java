@@ -138,7 +138,7 @@ public class MongoDBAdapter implements DBAdapter {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close(){
         this.db = null;
         this.client.close();
     }

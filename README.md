@@ -30,34 +30,24 @@ The library JAR will be built and placed in the `target` directory of the projec
 ## Startup Guide:
 ### Initialization:
 To use the shared DatabaseAdapter, it must be initialized with a concrete adapter class type at the
- beginning of the program (preferably).
+ beginning of the program (preferably). To connect to the database adapter selected in initialization, a ConnectionInfo object must be created 
+and `.connect(ConnectionInfo)` must be called.
  example using the built in MongoDBAdapter:
  ```java
+
 public class Test{
     public static void main(String[] args){
-        try {
-            DatabaseAdapter.shared = new DatabaseAdapter(MongoDBAdapter.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
-
-```
-### Connecting:
-To connect to the database adapter selected in initialization, a ConnectionInfo object must be created 
-and `DatabaseAdapter.shared.connect(ConnectionInfo)` must be called. We will continue the example using
-MongoDB:
-```java
-ConnectionInfo info = new ConnectionInfo();
+        ConnectionInfo info = new ConnectionInfo();
         info.protocol = "mongodb";
         info.addHost("localhost",27017,"test","test");
         info.database = "foodtruck";
         info.useSsl = false;
-try{
-    DatabaseAdapter.shared.connect(info);
-}catch(Exception e){ 
-    e.printStackTrace();
+        try {
+            DatabaseAdapter.produceMongoAdapter().connect(info);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 ```
 
@@ -70,7 +60,7 @@ the data that should be involved in the query (for insert and update operations)
  has a different concrete subclass of the QueryInformation interface) and returns it to be used by the user. We will 
  continue our MongoDB example:
  ```java
-MongoQuery query = DatabaseAdapter.shared.queryFactory();
+MongoQuery query = DatabaseAdapter.produceMongoAdapter().queryFactory();
 query.setCollection("exampleCollection");
 ```
 ### CRUD Operations
@@ -93,12 +83,12 @@ public class User extends Entity{
 This represents a user in the real world that has a name, and an id.
 We can insert a user into the database with the following example:
 ```java
-MongoQuery query = DatabaseAdapter.shared.queryFactory();
+MongoQuery query = DatabaseAdapter.produceMongoAdapter().queryFactory();
 query.setCollection("users");
 User andrew = new User();
 andrew.name = "Andrew";
 try{
-    DatabaseAdapter.shared.create(query,andrew);
+    DatabaseAdapter.produceMongoAdapter().create(query,andrew);
 }catch(Exception e){
     e.printStackTrace();
 }
@@ -110,10 +100,10 @@ that represent the data.
  We can read all users in our mongo example by
  performing the following query:
  ```java
-MongoQuery query = DatabaseAdapter.shared.queryFactory();
+MongoQuery query = DatabaseAdapter.produceMongoAdapter().queryFactory();
 query.setCollection("users");
 try{
-    List<User> users = DatabaseAdapter.shared.read(query,User.class);
+    List<User> users = DatabaseAdapter.produceMongoAdapter().read(query,User.class);
 }catch(Exception e){
     e.printStackTrace();
 }
@@ -126,12 +116,12 @@ filters for the type of data we want updated (eg. change the age of everyone nam
 the specific QueryInformation for your selected adapter on how to do that.
 Here we will just update everyone in the user table and change their name to 'Andrew':
 ```java
-MongoQuery query = DatabaseAdapter.shared.queryFactory();
+MongoQuery query = DatabaseAdapter.produceMongoAdapter().queryFactory();
 query.setCollection("users");
 User andrew = new User();
 andrew.name = "Andrew";
 try{
-    DatabaseAdapter.shared.update(query,andrew);
+    DatabaseAdapter.produceMongoAdapter().update(query,andrew);
 }catch(Exception e){
     e.printStackTrace();
 }
@@ -141,11 +131,11 @@ try{
 Delete queries remove data from the database by applying a filter provided in the QueryInformation. In the 
 following example we will delete everyone named 'Andrew':
 ```java
-MongoQuery query = DatabaseAdapter.shared.queryFactory();
+MongoQuery query = DatabaseAdapter.produceMongoAdapter().queryFactory();
 query.setCollection("users");
 query.filter = Filters.eq("name","Andrew");
 try{
-    DatabaseAdapter.shared.deleteMany(query);
+    DatabaseAdapter.produceMongoAdapter().deleteMany(query);
 }catch(Exception e){
     e.printStackTrace();
 }
