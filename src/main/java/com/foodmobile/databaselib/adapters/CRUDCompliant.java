@@ -3,10 +3,13 @@ package com.foodmobile.databaselib.adapters;
 import com.foodmobile.databaselib.models.Entity;
 
 import java.util.List;
+import java.util.Optional;
 
 interface CRUDCompliant {
 
     public <T> List<T> read(QueryDetails details, Class<T> tClass) throws Exception;
+
+    public <T> Optional<T> readOne(QueryDetails details, Class<T> tClass) throws Exception;
 
     public <T extends Entity> int create(QueryDetails details,T obj) throws Exception;
 

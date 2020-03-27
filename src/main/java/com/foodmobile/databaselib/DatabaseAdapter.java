@@ -43,6 +43,11 @@ public class DatabaseAdapter implements DBAdapter {
         return this.adapter.orElseThrow(NoAdapterOpenException::new).read(details,tClass);
     }
 
+    @Override
+    public <T> Optional<T> readOne(QueryDetails details, Class<T> tClass) throws Exception {
+        return this.adapter.orElseThrow(NoAdapterOpenException::new).readOne(details,tClass);
+    }
+
     /** Inserts 1 entity into the database. The information for the insert query is gatherd by calling obj.keyValuePairs.
      * Any custom serialization of data should be done by overriding the method keyValuePairs(Class< ? extends Annotation > ...)
      * in the class T.

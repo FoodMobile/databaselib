@@ -12,21 +12,6 @@ import java.util.stream.Collectors;
 
 public abstract class Entity {
     public Entity(){}
-    public Entity(Document doc){
-        Field[] fields = FieldUtils.getAllFields(this.getClass());
-        for(Field f : fields){
-            if(f.isAnnotationPresent(DBIgnore.class)){continue;}
-            if (doc.containsKey(f.getName())){
-                Object value = doc.get(f.getName());
-                try {
-                    FieldUtils.writeField(this,f.getName(),value,true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
 
     public Map<String,Object> keyValuePairs(Class<? extends Annotation>  ... ignoring){
         return Arrays.stream(FieldUtils.getAllFields(this.getClass())).filter(f ->{

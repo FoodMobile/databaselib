@@ -11,7 +11,6 @@ import com.foodmobile.databaselib.models.Entity;
 import org.bson.*;
 import org.bson.conversions.Bson;
 
-import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -32,26 +31,25 @@ public class MongoDBAdapter implements DBAdapter {
                 .orElseThrow(InvalidQueryType::new);
 
         List<T> results = new LinkedList<>();
-        MongoCollection<Document> collection = this.db.getCollection(query.collection);
-        Constructor<T> constr = tClass.getConstructor(Document.class);
+        var collection = this.db.getCollection(query.collection,tClass);
         if(query.filter == null){
-            collection.find().forEach((Consumer<? super Document>) d -> {
-                try {
-                    results.add(constr.newInstance(d));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            collection.find().forEach((Consumer<T> ) results::add);
         }else {
-            collection.find(query.filter).forEach((Consumer<? super Document>) d -> {
-                try {
-                    results.add(constr.newInstance(d));
-                } catch (Exception e) {
-                }
-            });
+            collection.find(query.filter).forEach((Consumer<T>) results::add);
         }
-
         return results;
+    }
+
+    @Override
+    public <T> Optional<T> readOne(QueryDetails details, Class<T> tClass) throws Exception {
+        MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
+                .orElseThrow(InvalidQueryType::new);
+        var collection = this.db.getCollection(query.collection);
+        if(query.filter == null){
+            return Optional.ofNullable(collection.find(tClass).cursor().tryNext());
+        }else{
+            return Optional.ofNullable(collection.find(query.filter,tClass).cursor().tryNext());
+        }
     }
 
     @Override
@@ -68,7 +66,9 @@ public class MongoDBAdapter implements DBAdapter {
     public <T extends Entity> int update(QueryDetails details, T obj) throws Exception{
         MongoQuery query = Optional.ofNullable((details instanceof MongoQuery) ? (MongoQuery)details : null)
                 .orElseThrow(InvalidQueryType::new);
-        MongoCollection<Document> collection = this.db.getCollection(query.collection);
+
+        var collection = this.db.getCollection(query.collection,obj.getClass());
+
         Bson updateObj = new Document(obj.keyValuePairs(DBIgnore.class));
         collection.updateOne(query.filter,updateObj);
         return 1;
