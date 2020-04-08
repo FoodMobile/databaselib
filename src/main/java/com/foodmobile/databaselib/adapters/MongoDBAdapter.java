@@ -2,13 +2,17 @@ package com.foodmobile.databaselib.adapters;
 
 import com.foodmobile.databaselib.annotations.DBId;
 import com.foodmobile.databaselib.annotations.DBIgnore;
-import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoClients;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.foodmobile.databaselib.exceptions.InvalidHostException;
 import com.foodmobile.databaselib.exceptions.InvalidQueryType;
 import com.foodmobile.databaselib.models.Entity;
 import org.bson.*;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
 import java.util.LinkedList;
@@ -122,19 +126,17 @@ public class MongoDBAdapter implements DBAdapter {
      * (see com.foodmobile.databaselib.exceptions for a list of exceptions)
      */
     @Override
+    @Deprecated
     public void connect(ConnectionInfo info) throws Exception{
-        List<ServerAddress> addressList = info.hosts
-                .stream()
-                .map((h)-> new ServerAddress(h.hostName,h.hostPort))
-                .collect(Collectors.toList());
+        throw new UnsupportedOperationException();
+    }
 
-        Host firstHost = info.hosts.stream().findFirst().orElseThrow(InvalidHostException::new).validate();
-        MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(info.connectionsPerHost).sslEnabled(info.useSsl).build();
-        MongoCredential credential = MongoCredential.createCredential(firstHost.username,info.database,firstHost.password.toCharArray());
-
-        this.client = new MongoClient(addressList,credential,options);
-
-        this.db = this.client.getDatabase(info.database);
+    public void applyMongoConnectionString(String connectionString, String databaseName) throws Exception {
+        CodecRegistry codecRegistry = org.bson.codecs.configuration.CodecRegistries.fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(), 
+            org.bson.codecs.configuration.CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        this.client = MongoClients.create(connectionString);
+        this.db = this.client.getDatabase(databaseName).withCodecRegistry(codecRegistry);
     }
 
     @Override

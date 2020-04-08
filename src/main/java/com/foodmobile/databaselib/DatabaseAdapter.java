@@ -17,14 +17,18 @@ import java.util.Optional;
  */
 public class DatabaseAdapter implements DBAdapter {
 
-    private Optional<DBAdapter> adapter;
+    private Optional<DBAdapter> adapter = Optional.empty();
 
     /**
      * Shared reference to the database adapter.
      */
     private static DatabaseAdapter shared = new DatabaseAdapter();
 
-    public static DBAdapter produceMongoAdapter(){
+    public static void connectMongo(String connectionString, String databaseName) throws Exception {
+        ((MongoDBAdapter)produceMongoAdapter().adapter.get()).applyMongoConnectionString(connectionString, databaseName);
+    }
+
+    public static DatabaseAdapter produceMongoAdapter(){
         if(shared.adapter.isEmpty()){
             shared.adapter = Optional.of(new MongoDBAdapter());
         }
